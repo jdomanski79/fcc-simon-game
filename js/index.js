@@ -19,7 +19,7 @@ console.clear();
   let userMoveTimeout;
   let pressedButtonId;
   let notifyTimeout;
-  let autoTurnoffTimeout;
+  let autoTurnoffCounter;
   let playSeqInterval;
   let userCorrect;
   
