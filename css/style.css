@@ -130,7 +130,7 @@ td{
   transform: translate(1px,1px);
 }
 .start-btn {
-  background-color: yellow;
+  background-color: grey;
 }
 .strict-btn{
   background-color: red;

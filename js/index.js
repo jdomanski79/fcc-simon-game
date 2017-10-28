@@ -3,6 +3,7 @@ console.clear();
 (function(){
   // variables 
   let strictMode = false;
+  let simonGameOff = true;
   const buttonsId = ['tr','br','bl','tl'];
   const buttonSounds = {
     tr : new Audio('https://s3.amazonaws.com/freecodecamp/simonSound1.mp3'),
@@ -14,7 +15,7 @@ console.clear();
   let buttons = document.querySelectorAll('.main-btn');
   let mainSequence;
   let userSequence;
-  const USER_MOVE_TIME = 10000;
+  const USER_MOVE_TIME = 5000;
   const PLAY_SEQUENCE_TIME = 700;
   let userMoveTimeout;
   let pressedButtonId;
@@ -29,12 +30,20 @@ console.clear();
   // inital
   
   function toggleStrictMode(){
-    document.getElementById('strict-light').classList.toggle('active');
-    strictMode = !strictMode;
+    if (!simonGameOff) {
+      document.getElementById('strict-light').classList.toggle('active');
+      strictMode = !strictMode;
+    }
   }
   
   function nextStep(start){
     if (start){
+      if (simonGameOff) {
+        startButtonLight(true);
+        simonGameOff = false;
+      }
+
+      autoTurnoffCounter = 0;
       // reset all
       clearTimeout(userMoveTimeout);
       clearTimeout(notifyTimeout);
@@ -74,13 +83,14 @@ console.clear();
   
   function handleBtnClicked (event){
     clearTimeout(userMoveTimeout);
-        
+    autoTurnoffCounter = 0;
+
     if (event.type === 'mousedown'){
       pressedButtonId = this.id;
       this.classList.add('flash'); // flash button
       playSound(this.id);
       userSequence.push(this.id);
-      userCorrect = userSequenceCorrect();
+      userCorrect = isUserSeqCorrect();
       return;
     } 
     
@@ -88,12 +98,11 @@ console.clear();
 			document.getElementById(pressedButtonId).classList.remove('flash');
       pressedButtonId = null;    	
       handleUserAnswer(userCorrect);
-      //autoTurnoffTimeout = setTimeout(nestStep,30000,'stop');
     }
   }
     
   
-  function userSequenceCorrect(){
+  function isUserSeqCorrect(){
     return userSequence.every((el,i) => {
       return el === mainSequence[i];
     });
@@ -103,12 +112,7 @@ console.clear();
     console.log('User history: ', userSequence);
     
     if (!userCorrect) { 
-      if (strictMode) {
-        notify('!!!', () => nextStep(true));
-        return;
-      }
-      notify('!!!', replayHistory);
-    
+      handleUserIncorrect();
     } else if (userSequence.length === mainSequence.length){
       if (mainSequence.length === 20){
         console.log('You won - 20 repats');
@@ -121,7 +125,16 @@ console.clear();
       setUserMoveTimeout();
     }
   }
-    
+  
+  
+  function handleUserIncorrect() {
+    if (strictMode) {
+        notify('!!!', () => nextStep(true));
+        return;
+      }
+      notify('!!!', replayHistory);
+  }
+
   function replayHistory(){
     userSequence = [];
 		updCountWindow();    
@@ -174,8 +187,24 @@ console.clear();
   }
   
   function setUserMoveTimeout(){
-    userMoveTimeout = setTimeout(handleUserAnswer, USER_MOVE_TIME, false);
+    userMoveTimeout = setTimeout(handleUserTimeout, USER_MOVE_TIME);
   }
+
+  function handleUserTimeout() {
+    console.log('autoTurnoffCounter: ', autoTurnoffCounter);
+    if (++autoTurnoffCounter === 4) {
+      document.querySelector('.count-window').innerHTML = '&nbsp';
+      startButtonLight(false);
+      simonGameOff = true;
+    } else {
+      handleUserIncorrect();
+    }
+  }
+function startButtonLight(turnOn) {
+  let backgroundColor = turnOn ? 'yellow':'';
+  document.querySelector('.start-btn').style.backgroundColor = backgroundColor;
+}
+
   
   function flash(field){
     document.getElementById(field).classList.add('flash');
