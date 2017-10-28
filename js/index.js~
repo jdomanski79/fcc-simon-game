@@ -1,0 +1,198 @@
+'use strict';
+console.clear();
+(function(){
+  // variables 
+  let strictMode = false;
+  let fields = ['tr','br','bl','tl'];
+  let notifyWindow = document.getElementById('count');
+  let globalHistory,userHistory;
+  const ANSWER_INTERVAL = 5000;
+  const PLAY_INTERVAL = 400;
+  let userMoveTimeout, buttonDown;
+  let notifyInterval,playInterval;
+  let currAnswerCorrect;
+  
+    //event listeners
+  document.getElementById('strict-btn').addEventListener('click',toggleStrictMode);
+  document.getElementById('start-btn').addEventListener('click',() => nextStep(true));
+  // inital
+  notifyWindow.innerHTML ='&nbsp';
+  
+  function toggleStrictMode(){
+    document.getElementById('strict-light').classList.toggle('active');
+    strictMode = !strictMode;
+  }
+  
+  function nextStep(start){
+    
+    if (start){
+      // reset all
+      clearTimeout(userMoveTimeout);
+      clearTimeout(notifyInterval);
+      clearInterval(playInterval);
+      turnOffLight();
+      globalHistory = [randomMove()];
+    } else {
+      globalHistory.push(randomMove());
+    }
+    
+    userHistory = [];
+    // flash count window, then playHistory
+    notify(String(globalHistory.length), playHistory);
+  }
+  
+  function listenUser(action){
+    let i, btns = document.querySelectorAll('.main-btn');
+    
+    if (action === 'on'){
+      document.addEventListener('mouseup',handleBtnClicked);
+      
+      for (i = 0; i < btns.length; i++){
+        btns[i].addEventListener('mousedown',handleBtnClicked);
+        btns[i].classList.add('pointer');
+        return;
+      }
+    
+    if (action === 'off'){
+      document.removeEventListener('mouseup',handleBtnClicked);
+      
+      for (i = 0; i < btns.length; i++){
+        btns[i].removeEventListener('mousedown',handleBtnClicked);
+        btns[i].classList.remove('pointer');
+      }
+    }
+  }
+  
+  function playSound(btnId){
+    document.getElementById('audio-'+ btnId).play();
+    //console.log('Playing btn ', btnId);
+  }
+  
+  function turnOffLight(){
+    let btns = document.querySelectorAll('.main-btn');
+      for (let i = 0; i < btns.length; i++){
+        btns[i].classList.remove('flash');
+      }
+  }
+  
+  function handleBtnClicked (event){
+    clearTimeout(userMoveTimeout);
+    
+    if (event.type === 'mousedown'){
+    	buttonDown = true;
+      event.target.classList.add('flash'); // flash button
+      playSound(event.target.id);
+      userHistory.push(event.target.id);
+      currAnswerCorrect = checkUserAnswer();
+      return;
+    } 
+    
+    if (event.type === 'mouseup' && buttonDown){
+			buttonDown = false;    	
+    	turnOffLight();
+      handleUserAnswer(currAnswerCorrect);
+    }
+  }
+    
+  function checkUserAnswer(){
+    return userHistory.every((el,i) => {
+      return el === globalHistory[i];
+    });
+  }
+  
+  function handleUserAnswer(correctAnswer){
+    console.log('User history: ', userHistory);
+    
+    if (!correctAnswer) { 
+      if (strictMode) {
+        notify('!!!',()=>nextStep(true));
+        return;
+      }
+      notify('!!!',replayHistory);
+    } else if (userHistory.length === globalHistory.length){
+      if (globalHistory.length === 20){
+        console.log('You won - 20 repats');
+        nextStep(true);
+        return;
+      }
+      
+      console.log('GOOD!!!');
+      turnOffLight();
+      nextStep();
+    } else{
+      setAnswerTimeout();
+    }
+  }
+   
+    
+  function replayHistory(){
+    userHistory = [];
+		updCountWindow();    
+    turnOffLight();
+    notify(String(globalHistory.length),playHistory);
+  }
+  
+  function updCountWindow(msg){
+    notifyWindow.innerHTML = (msg) ? msg : globalHistory.length;
+  }
+  
+  function notify(msg,callback){
+    listenUser('off');
+    let counter = 1;
+    notifyInterval = setTimeout(setNotifyTimeout,400,msg,0,callback);
+  }
+      
+  function setNotifyTimeout(msg, repetition,callback){    
+    console.log(arguments);
+    (repetition % 2 === 0)? updCountWindow(msg) : updCountWindow('&nbsp');
+    
+    if (repetition === 4){
+      if (callback) callback();
+      return;
+    }
+    
+    repetition++;
+    notifyInterval = setTimeout(setNotifyTimeout, 400, msg, repetition, callback);
+    
+  }
+  
+  
+ 
+  function playHistory(){
+    let interval, currField, count = 0;
+    let arr = globalHistory.slice(0);
+    //turning off button listeners
+    listenUser('off');
+    
+    playInterval = setInterval(()=>{
+      count++;
+      if (arr.length === 0 && count % 2 === 0){
+        clearInterval(playInterval);
+        setAnswerTimeout();
+        listenUser('on');  
+      }
+      if (count % 2 !== 0){
+        currField = arr.shift();
+        playSound(currField);
+      }
+      
+      flash(currField);
+    },PLAY_INTERVAL);
+    
+  }
+  
+  function setAnswerTimeout(){
+    userMoveTimeout = setTimeout(()=>handleUserAnswer(false),ANSWER_INTERVAL);
+  }
+  
+  function flash(field){
+    document.getElementById(field).classList.toggle('flash');  
+  }
+  
+  function randomMove(){
+    return fields[Math.floor(Math.random()*4)];
+  }
+  
+
+
+})();

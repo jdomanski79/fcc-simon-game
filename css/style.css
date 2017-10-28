@@ -1,0 +1,141 @@
+
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body{
+  height: 100vh;
+  background: linear-gradient(to top, black, lightblue);
+  display: flex;
+   align-items: center;
+  justify-content: center;
+}
+.main{
+  display: flex;
+  height: 500px;
+  width: 500px;
+  min-width: 400px;
+  min-height: 400px;
+  box-sizing: border-box;
+  position: relative;
+}
+.main-btn{
+  box-shadow: 0px 0px 20px black;
+  height: 50%;
+  width: 50%;
+  border-style: solid;
+  border-color: black;
+  position: absolute;
+}
+.main-btn.pointer{
+  cursor: pointer;
+}
+.top-left{
+  top: 0;
+  left: 0;
+  border-width: 15px 10px 10px 15px;
+  background-color: green;
+  border-top-left-radius: 250px;
+}
+.top-right{
+  border-width: 15px 15px 10px 10px;
+  top: 0;
+  right: 0;
+  background-color: red;
+  border-top-right-radius: 250px;
+}
+.bottom-right{
+  border-width: 10px 15px 15px 10px;
+  bottom: 0;
+  right: 0;
+  background-color: blue;
+  border-bottom-right-radius: 250px;
+}
+.bottom-left{
+  border-width: 10px 10px 15px 15px;
+  bottom: 0;
+  left: 0;
+  background-color: gold;
+  border-bottom-left-radius: 250px;
+}
+.flash{
+  background-color: white;
+}
+.inner{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Kalam';
+  
+  z-index: 1;
+  height: 56%;
+  width: 56%;
+  margin: auto;
+  border: 20px solid black;
+  border-radius: 100%;
+  background:radial-gradient(circle, lightgreen, white);
+}
+#title{
+  margin-top: 30px;
+  font-size: 58px;
+  text-align: center;
+}
+.inner-controls{
+  table-layout: fixed;
+  width: 200px;
+  justify-content: space-around;
+}
+td{
+  text-align: center;
+  width: 50px;
+}
+.count-window{
+  /* flex-basis: 33%; */
+  background-color: black;
+  color: red;
+  padding: 0px;
+  margin: auto;
+  font-size: 20px;
+  width:50px;
+  /* border: 3px solid red; */
+  border-radius: 10px;
+   /* box-shadow: 0 0 10px red; */
+}
+.strict-light{
+  width: 10px;
+  height: 10px;
+  margin: auto;
+  background-color: black;
+  border: 2px solid black;
+  border-radius: 10px;
+}
+.strict-light.active{
+  background-color: yellow;
+}
+.start-btn,.strict-btn{
+  margin: auto;
+  font-size: 20px;
+  width: 25px;
+  height: 25px;
+  border: 3px solid black;
+  box-shadow: 0 0 3px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+.start-btn:active, .strict-btn:active{
+  box-shadow: 0 0 0px;
+  transform: translate(1px,1px);
+}
+.start-btn {
+  background-color: yellow;
+}
+.strict-btn{
+  background-color: red;
+}
+
+[class*='caption']{
+  font-size: 15px;
+}
+
+
