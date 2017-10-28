@@ -15,9 +15,8 @@ body{
   display: flex;
   height: 500px;
   width: 500px;
-  min-width: 400px;
-  min-height: 400px;
-  box-sizing: border-box;
+  min-width: 500px;
+  min-height: 500px;
   position: relative;
 }
 .main-btn{
@@ -123,6 +122,9 @@ td{
   border-radius: 30px;
   cursor: pointer;
 }
+/* .start-btn {
+  box-shadow: 0 0 5px yellow;
+} */
 .start-btn:active, .strict-btn:active{
   box-shadow: 0 0 0px;
   transform: translate(1px,1px);

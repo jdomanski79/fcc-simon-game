@@ -3,16 +3,23 @@ console.clear();
 (function(){
   // variables 
   let strictMode = false;
-  let buttonsId = ['tr','br','bl','tl'];
+  const buttonsId = ['tr','br','bl','tl'];
+  const buttonSounds = {
+    tr : new Audio('https://s3.amazonaws.com/freecodecamp/simonSound1.mp3'),
+    br : new Audio('https://s3.amazonaws.com/freecodecamp/simonSound2.mp3'),
+    bl : new Audio('https://s3.amazonaws.com/freecodecamp/simonSound3.mp3'),
+    tl : new Audio('https://s3.amazonaws.com/freecodecamp/simonSound4.mp3'), 
+  }
   let notifyWindow = document.getElementById('count');
   let buttons = document.querySelectorAll('.main-btn');
   let mainSequence;
   let userSequence;
-  const USER_MOVE_TIME = 5000;
-  const PLAY_SEQUENCE_TIME = 600;
+  const USER_MOVE_TIME = 10000;
+  const PLAY_SEQUENCE_TIME = 700;
   let userMoveTimeout;
   let pressedButtonId;
   let notifyTimeout;
+  let autoTurnoffTimeout;
   let playSeqInterval;
   let userCorrect;
   
@@ -20,7 +27,6 @@ console.clear();
   document.getElementById('strict-btn').addEventListener('click',toggleStrictMode);
   document.getElementById('start-btn').addEventListener('click',() => nextStep(true));
   // inital
-  notifyWindow.innerHTML ='&nbsp';
   
   function toggleStrictMode(){
     document.getElementById('strict-light').classList.toggle('active');
@@ -28,7 +34,6 @@ console.clear();
   }
   
   function nextStep(start){
-    
     if (start){
       // reset all
       clearTimeout(userMoveTimeout);
@@ -45,19 +50,17 @@ console.clear();
   }
   
   function listenUser(action){
-    let i;
-    
     if (action === 'on') {
       document.addEventListener('mouseup',handleBtnClicked);
       
-      for (i = 0; i < buttons.length; i++){
+      for (let i = 0; i < buttons.length; i++){
         buttons[i].addEventListener('mousedown',handleBtnClicked);
         buttons[i].classList.add('pointer');
       }
     } else if (action === 'off') {
       document.removeEventListener('mouseup',handleBtnClicked);
       
-      for (i = 0; i < buttons.length; i++){
+      for (let i = 0; i < buttons.length; i++){
         buttons[i].removeEventListener('mousedown',handleBtnClicked);
         buttons[i].classList.remove('pointer');
       }
@@ -65,18 +68,18 @@ console.clear();
   }
   
   function playSound(btnId){
-    document.getElementById('audio-'+ btnId).play();
+    buttonSounds[btnId].play();
     //console.log('Playing btn ', btnId);
   }
   
   function handleBtnClicked (event){
     clearTimeout(userMoveTimeout);
-    
+        
     if (event.type === 'mousedown'){
-      pressedButtonId = event.target.id;
-      event.target.classList.add('flash'); // flash button
-      playSound(pressedButtonId);
-      userSequence.push(pressedButtonId);
+      pressedButtonId = this.id;
+      this.classList.add('flash'); // flash button
+      playSound(this.id);
+      userSequence.push(this.id);
       userCorrect = userSequenceCorrect();
       return;
     } 
@@ -85,9 +88,11 @@ console.clear();
 			document.getElementById(pressedButtonId).classList.remove('flash');
       pressedButtonId = null;    	
       handleUserAnswer(userCorrect);
+      //autoTurnoffTimeout = setTimeout(nestStep,30000,'stop');
     }
   }
     
+  
   function userSequenceCorrect(){
     return userSequence.every((el,i) => {
       return el === mainSequence[i];
@@ -181,6 +186,4 @@ console.clear();
     return buttonsId[Math.floor(Math.random()*4)];
   }
   
-
-
 })();
